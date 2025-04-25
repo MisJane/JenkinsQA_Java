@@ -6,7 +6,7 @@ import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 import school.redrover.common.BaseTest;
 import school.redrover.page.HomePage;
-import school.redrover.page.OrganizationFolderPage;
+import school.redrover.page.organizationfolder.OrganizationFolderPage;
 
 public class Folder2Test extends BaseTest {
 

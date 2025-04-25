@@ -1,9 +1,10 @@
-package school.redrover.page;
+package school.redrover.page.folder;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import school.redrover.common.BasePage;
+import school.redrover.page.HomePage;
 
 public class FolderConfigurationPage extends BasePage {
 

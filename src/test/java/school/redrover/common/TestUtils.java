@@ -138,22 +138,6 @@ public class TestUtils {
                 .until(ExpectedConditions.textToBePresentInElementLocated(By.cssSelector(newUserLink), userName));
     }
 
-    public static WebElement waitUntilVisible5(BaseTest baseTest, By element) {
-        try {
-            return baseTest.getWait5().until(ExpectedConditions.visibilityOfElementLocated(element));
-        } catch (Exception e) {
-            throw new RuntimeException("Element DIDN'T APPEAR during 5 seconds: " + element, e);
-        }
-    }
-
-    public static WebElement waitUntilVisible10(BaseTest baseTest, By element) {
-        try {
-            return baseTest.getWait5().until(ExpectedConditions.visibilityOfElementLocated(element));
-        } catch (Exception e) {
-            throw new RuntimeException("Element DIDN'T APPEAR during 10 seconds: " + element, e);
-        }
-    }
-
     public static void createProject(BaseTest baseTest) {
         baseTest.getWait5().until(ExpectedConditions.visibilityOfElementLocated(By
                 .className("jenkins-breadcrumbs__list-item"))).click();

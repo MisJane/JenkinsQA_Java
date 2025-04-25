@@ -7,7 +7,7 @@ import org.testng.annotations.Test;
 import school.redrover.common.BaseTest;
 import school.redrover.common.TestUtils;
 import school.redrover.page.HomePage;
-import school.redrover.page.PipelineProjectPage;
+import school.redrover.page.pipeline.PipelineProjectPage;
 
 public class Pipeline2Test extends BaseTest {
 

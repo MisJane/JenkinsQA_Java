@@ -1,4 +1,4 @@
-package school.redrover.page;
+package school.redrover.page.freestyle;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -7,6 +7,8 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import school.redrover.common.BasePage;
 import school.redrover.common.TestUtils;
+import school.redrover.page.HomePage;
+
 import java.time.Duration;
 import java.util.List;
 

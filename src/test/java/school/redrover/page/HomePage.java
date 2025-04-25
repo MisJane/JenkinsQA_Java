@@ -5,11 +5,16 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import school.redrover.common.BasePage;
+import school.redrover.page.account.AccountSettingsPage;
+import school.redrover.page.buildhistory.BuildHistoryPage;
+import school.redrover.page.freestyle.FreestyleProjectPage;
+import school.redrover.page.managejenkins.ManageJenkinsPage;
+import school.redrover.page.multiconfiguration.MultibranchProjectPage;
+import school.redrover.page.newitem.NewItemPage;
+import school.redrover.page.organizationfolder.OrganizationFolderPage;
+import school.redrover.page.pipeline.PipelineConfigurationPage;
 
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 
 public class HomePage extends BasePage {
 
@@ -46,7 +51,7 @@ public class HomePage extends BasePage {
         return getDriver().findElement(By.cssSelector("#description > div:nth-child(1)")).getText();
     }
 
-    public String getWelcomeMessage(){
+    public String getWelcomeMessage() {
 
         return getWait5().until(ExpectedConditions.visibilityOf(getDriver().findElement(By.xpath("//h1"))))
                 .getText();
@@ -75,11 +80,21 @@ public class HomePage extends BasePage {
         getWait10().until(ExpectedConditions.visibilityOfElementLocated(
                 By.xpath("//td/a[@href='job/" + nameItem.replace(" ", "%20") + "/']"))).click();
 
-        return new  FreestyleProjectPage(getDriver());
+        return new FreestyleProjectPage(getDriver());
+    }
+
+    public <T> T clickOnJobInListOfItems(String nameItem, T resultPage) {
+        getWait10()
+                .until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[text()='" + nameItem + "']")))
+                .click();
+
+        return resultPage;
     }
 
     public FreestyleProjectPage clickOnJobInListOfItems(String nameItem) {
-        getWait10().until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[text()='" + nameItem + "']"))).click();
+        getWait10()
+                .until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[text()='" + nameItem + "']")))
+                .click();
 
         return new FreestyleProjectPage(getDriver());
     }
@@ -95,7 +110,7 @@ public class HomePage extends BasePage {
         return new AccountSettingsPage(getDriver());
     }
 
-    public ManageJenkinsPage clickManageJenkinsOnLeftSidePanel(){
+    public ManageJenkinsPage clickManageJenkinsOnLeftSidePanel() {
         getWait10().until(ExpectedConditions
                 .visibilityOfElementLocated(By.xpath("//a[@href='/manage']"))).click();
 
@@ -104,7 +119,7 @@ public class HomePage extends BasePage {
 
     public OrganizationFolderPage clickOnOrganizationFolderInListOfItems(String nameItem) {
         getWait5().until(ExpectedConditions.visibilityOf(getDriver()
-                        .findElement(By.xpath("//span[text()='" + nameItem + "']")))).click();
+                .findElement(By.xpath("//span[text()='" + nameItem + "']")))).click();
 
         return new OrganizationFolderPage(getDriver());
     }
@@ -126,9 +141,9 @@ public class HomePage extends BasePage {
     }
 
     public BuildHistoryPage clickBuildHistoryTab() {
-       getDriver().findElement(By.xpath("//a[@href='/view/all/builds']")).click();
+        getDriver().findElement(By.xpath("//a[@href='/view/all/builds']")).click();
 
-       return new BuildHistoryPage(getDriver());
+        return new BuildHistoryPage(getDriver());
     }
 
     public List<String> getProjectNameList() {

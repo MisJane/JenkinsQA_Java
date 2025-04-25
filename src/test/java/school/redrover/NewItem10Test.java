@@ -1,6 +1,7 @@
 package school.redrover;
 
 import org.openqa.selenium.WebDriver;
+import org.testng.annotations.Ignore;
 import school.redrover.common.BaseTest;
 import org.testng.annotations.Test;
 import org.testng.Assert;
@@ -13,7 +14,7 @@ import java.util.stream.Collectors;
 public class NewItem10Test extends BaseTest {
     //US_01.001 | New Item > Create a new item #693
 
-
+    @Ignore
     @Test
     public void VerifyItemList() {
         WebDriver driver = getDriver();

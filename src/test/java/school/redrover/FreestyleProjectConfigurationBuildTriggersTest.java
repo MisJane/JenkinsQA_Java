@@ -9,7 +9,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import school.redrover.common.BaseTest;
 import school.redrover.common.TestUtils;
-import school.redrover.page.FreestyleConfigurationPage;
+import school.redrover.page.freestyle.FreestyleConfigurationPage;
 import school.redrover.page.HomePage;
 
 import java.util.List;
@@ -17,6 +17,12 @@ import java.util.List;
 public class FreestyleProjectConfigurationBuildTriggersTest extends BaseTest {
 
     private static final String PROJECT_NAME = "New project";
+    private static final String AUTH_TOKEN = "sometoken8ad01cf431d742977b8cc82";
+    private static final String expectedTriggerInfoText = """
+        Use the following URL to trigger build remotely: JENKINS_URL/job/New%20project/build?token=TOKEN_NAME or /buildWithParameters?token=TOKEN_NAME
+        Optionally append &cause=Cause+Text to provide text that will be included in the recorded build cause.
+        """.trim();
+    private static final String SCHEDULE = "H 14 * * 1-5";
 
     @Test
     public void testCheckBuildTriggersSection() {
@@ -64,48 +70,26 @@ public class FreestyleProjectConfigurationBuildTriggersTest extends BaseTest {
                 .getGithubHookTriggerHelpIconTitle(), "Help for feature: GitHub hook trigger for GITScm polling");
     }
 
-
     @Test()
     public void testRemoteTriggerOptionDisplaysTokenField() {
-        WebDriver driver = getDriver();
-        TestUtils.createFreestyleProject(getDriver(), PROJECT_NAME);
 
-        TestUtils.scrollToItemWithJS(driver,
-                driver.findElement(By.id("source-code-management")));
-
-        //Click on the checkbox
-        driver.findElement(By.xpath("//label[contains(text(), 'Trigger builds remotely')]")).click();
-
-        //Wait for the token field to be displayed and enter the token
-        driver.findElement(By.xpath("//input[@name='authToken']")).sendKeys("Authentication Token");
-        driver.findElement(By.xpath("//button[@name='Submit']")).click();
-
-        //Configure
-        driver.findElement(By.xpath("//*[@id=\"tasks\"]/div[5]/span/a")).click();
-        TestUtils.scrollToItemWithJS(driver,
-                driver.findElement(By.id("source-code-management")));
+        //Actions
+        FreestyleConfigurationPage freestyleConfigurationPage = new HomePage(getDriver())
+                .createJob()
+                .sendItemName(PROJECT_NAME)
+                .selectFreestyleAndClickOk()
+                .scrollToTriggersItem()
+                .clickTriggerBuildsRemotely()
+                .enterAuthToken(AUTH_TOKEN)
+                .clickSaveButton()
+                .clickConfigure()
+                .scrollToTriggersItem();
 
         //Assertions
-        Assert.assertEquals(
-                driver.findElement(By.xpath("//div[text()='Authentication Token']")).getText(),
-                "Authentication Token"
-        );
-        Assert.assertEquals(
-                driver.findElement(By.xpath("//input[@name='authToken']")).getDomAttribute("value"),
-                "Authentication Token"
-        );
-        Assert.assertEquals(
-                driver.findElement(By.xpath("//*[@id='main-panel']/form/div[1]/section[3]/div[3]/div[4]/div/div[2]"))
-                        .getText()
-                        .trim(),
-                """
-                        Use the following URL to trigger build remotely: JENKINS_URL/job/New%20project/build?token=TOKEN_NAME or /buildWithParameters?token=TOKEN_NAME
-                        Optionally append &cause=Cause+Text to provide text that will be included in the recorded build cause.
-                        """.trim(),
-                "Текст не совпадает с ожидаемым!"
-        );
+        Assert.assertEquals(freestyleConfigurationPage.getAuthenticationTokenLabelText(), "Authentication Token");
+        Assert.assertEquals(freestyleConfigurationPage.getAuthTokenDomValue(), AUTH_TOKEN);
+        Assert.assertEquals(freestyleConfigurationPage.getTriggerInfoText(), expectedTriggerInfoText);
     }
-
 
     @Test
     public void testBuildAfterOtherProjectsAreBuiltOptionDisplaysField() {
@@ -156,11 +140,8 @@ public class FreestyleProjectConfigurationBuildTriggersTest extends BaseTest {
         );
     }
 
-
     @Test
     public void testBuildPeriodicallyScheduleFieldIsDisplayed() {
-
-        final String Schedule = "H 14 * * 1-5";
 
         //Actions
         String actualSchedule = new HomePage(getDriver())
@@ -169,14 +150,13 @@ public class FreestyleProjectConfigurationBuildTriggersTest extends BaseTest {
                 .selectFreestyleAndClickOk()
                 .scrollToTriggersItem()
                 .checkBuildPeriodicallyCheckbox()
-                .sendScheduleText(Schedule)
+                .sendScheduleText(SCHEDULE)
                 .clickSaveButton()
                 .clickConfigure()
                 .scrollToTriggersItem()
                 .sendScheduleActualText();
 
-
         //Assertions
-        Assert.assertEquals(actualSchedule, Schedule, "Schedule text doesn't match expected text");
+        Assert.assertEquals(actualSchedule, SCHEDULE);
     }
 }

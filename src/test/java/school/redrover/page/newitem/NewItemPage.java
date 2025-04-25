@@ -1,4 +1,4 @@
-package school.redrover.page;
+package school.redrover.page.newitem;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -7,10 +7,16 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.WebElement;
 import school.redrover.common.BasePage;
 import school.redrover.common.TestUtils;
+import school.redrover.page.folder.FolderConfigurationPage;
+import school.redrover.page.freestyle.FreestyleConfigurationPage;
+import school.redrover.page.multiconfiguration.MultibranchConfigurationPage;
+import school.redrover.page.organizationfolder.OrganizationFolderConfigurePage;
+import school.redrover.page.pipeline.PipelineConfigurationPage;
 
 import java.time.Duration;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,13 +36,16 @@ public class NewItemPage extends BasePage {
         return getDriver().findElement(By.id("name")).getShadowRoot().findElement(By.cssSelector("div")).getText();
     }
 
+    public boolean isOkButtonEnabled() {
+        return getDriver().findElement(By.id("ok-button")).isEnabled();
+    }
+
     public String getAlertMessageText() {
         WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(5));
         return wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("itemname-invalid"))).getText();
     }
 
     public String getEmptyNameMessage() {
-
         return getWait10().until(ExpectedConditions.visibilityOfElementLocated(By.id("itemname-required"))).getText();
     }
 
@@ -78,19 +87,19 @@ public class NewItemPage extends BasePage {
     public List<String> getItemTypesTextList() {
         List<String> itemTypesTextList = new ArrayList<>();
         List<WebElement> webElementList = getDriver().findElements(By.xpath("//li[@role='radio']//span"));
-        for (WebElement webElement: webElementList) {
+        for (WebElement webElement : webElementList) {
             itemTypesTextList.add(webElement.getText());
         }
         return itemTypesTextList;
     }
-  
+
     public String getItemNameInvalidMessage() {
-        
+
         return getWait10().until(ExpectedConditions.visibilityOfElementLocated(By.id("itemname-invalid"))).getText();
     }
-  
+
     public String getCopyFromFieldText() {
-      
+
         return getWait10().until(ExpectedConditions.visibilityOfElementLocated(By.className("add-item-copy"))).getText();
     }
 
@@ -109,14 +118,14 @@ public class NewItemPage extends BasePage {
         return new FolderConfigurationPage(getDriver());
     }
 
-    public String getItemTypeText(String itemType){
+    public String getItemTypeText(String itemType) {
         return getDriver().findElement(By.xpath("//span[text()='" + itemType + "']")).getText();
     }
 
     public List<String> getAllItemsTypesLabels() {
         return getDriver().findElements(By.className("label"))
-                          .stream()
-                          .map(itemType -> itemType.getText()).collect(Collectors.toList());
+                .stream()
+                .map(itemType -> itemType.getText()).collect(Collectors.toList());
     }
 
     public NewItemPage enterProjectNameAndSelect(String nameProject, String projectTypeText) {
@@ -128,7 +137,6 @@ public class NewItemPage extends BasePage {
 
         return new NewItemPage(getDriver());
     }
-
 
     public NewItemPage selectFreestyleAndClickOkNoPageChange() {
         getDriver().findElement(By.cssSelector(".hudson_model_FreeStyleProject")).click();
@@ -156,4 +164,57 @@ public class NewItemPage extends BasePage {
                 .stream()
                 .map(jobDescription -> jobDescription.getText()).collect(Collectors.toList());
     }
+
+    public List<String> getAllProjectTypeTitles() {
+        return Arrays.asList(
+                        "//span[@class][text()='Freestyle project']",
+                        "//span[@class][text()='Pipeline']",
+                        "//span[@class][text()='Multi-configuration project']",
+                        "//span[@class][text()='Folder']",
+                        "//span[@class][text()='Multibranch Pipeline']",
+                        "//span[@class][text()='Organization Folder']"
+                ).stream()
+                .map(xpath -> getDriver().findElement(By.xpath(xpath)).getText())
+                .toList();
+    }
+
+    public String getCopyFromText() {
+        WebElement copyFromTextBlock = getDriver().findElement(By.xpath("//div[@class='add-item-copy']"));
+        return copyFromTextBlock.getText().trim();
+    }
+
+    public NewItemPage sendTextCopyForm(String text) {
+        WebElement actualTextCopyForm = getWait5().until(ExpectedConditions.visibilityOfElementLocated(
+                By.id("from")));
+        actualTextCopyForm.sendKeys(text);
+
+        return new NewItemPage(getDriver());
+    }
+
+    public String getAutocompleteSuggestionText() {
+        return getWait5()
+                .until(ExpectedConditions.visibilityOfElementLocated(By.id("tippy-7")))
+                .getText();
+    }
+
+    public NewItemPage clickOnJobItem(String itemLabel) {
+        WebElement itemType = getDriver().findElement(By.xpath(String.format("//span[text()='%s']", itemLabel)));
+        TestUtils.scrollAndClickWithJS(getDriver(), itemType);
+
+        return this;
+    }
+
+    public boolean isListItemHighlighted(String itemLabel) {
+        WebElement itemType = getDriver().findElement(By.xpath(String.format("//span[text()='%s']", itemLabel)));
+        WebElement listItem = itemType.findElement(By.xpath("./ancestor::li"));
+
+        return listItem.getDomAttribute("class").contains("active");
+    }
+
+    public String getErrorMessageOnEmptyField() {
+        return getWait5().until
+                (ExpectedConditions.visibilityOfElementLocated((By.cssSelector("#itemname-required.input-validation-message"))))
+                .getText();
+    }
 }
+

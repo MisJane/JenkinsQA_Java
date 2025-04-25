@@ -1,19 +1,17 @@
 package school.redrover;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.DataProvider;
 import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 import school.redrover.common.BaseTest;
 import school.redrover.common.TestUtils;
 import school.redrover.page.HomePage;
-import school.redrover.page.NewItemPage;
+import school.redrover.page.newitem.NewItemPage;
 import school.redrover.testdata.TestDataProvider;
 
 import java.util.List;
@@ -32,17 +30,6 @@ public class NewItemPage2Test extends BaseTest {
         } else {
             throw new IllegalStateException("WebDriver is null. Cannot initialize Actions.");
         }
-    }
-
-    private List<WebElement> getNewItemTypes() {
-        return getDriver().findElements(By.xpath("//li[@role='radio']"));
-    }
-
-    private int getScrollValue() {
-        List<WebElement> newItemTypes = getDriver().findElements(By.xpath("//li[@role='radio']"));
-        Dimension size = newItemTypes.get(0).getSize();
-
-        return (size.getHeight() - 12 * 2) * (newItemTypes.size() - 1);
     }
 
     private void clickOnNewItemLink() {
@@ -144,61 +131,28 @@ public class NewItemPage2Test extends BaseTest {
         Assert.assertEquals(actualItemDescriptions, expectedItemDescriptions);
     }
 
-    @Test(dataProvider = "itemTypes")
-    public void testIfSelectedItemIsHighlighted(String itemTypeName, String expectedItemDescription) {
-        clickOnNewItemLink();
+    @Test(dataProvider = "itemTypes", dataProviderClass = TestDataProvider.class)
+    public void testIfSelectedItemIsHighlighted(String itemTypeName) {
+        NewItemPage newItemPage = homePage.clickNewItemOnLeftSidePanel().clickOnJobItem(itemTypeName);
 
-        WebElement itemType = getDriver().findElement(By.xpath(String.format("//span[text()='%s']", itemTypeName)));
-        TestUtils.scrollAndClickWithJS(getDriver(), itemType);
-
-        WebElement parentLi = itemType.findElement(By.xpath("./ancestor::li"));
-
-        Assert.assertTrue(parentLi.getDomAttribute("class").contains("active"));
+        Assert.assertTrue(newItemPage.isListItemHighlighted(itemTypeName));
     }
 
-    @DataProvider(name = "itemTypes")
-    public Object[][] itemTypes() {
-        return new Object[][]{
-                {"Freestyle project", "Classic, general-purpose job type that checks out from up to one SCM, executes build steps serially, followed by post-build steps like archiving artifacts and sending email notifications."},
-                {"Pipeline", "Orchestrates long-running activities that can span multiple build agents. Suitable for building pipelines (formerly known as workflows) and/or organizing complex activities that do not easily fit in free-style job type."},
-                {"Multi-configuration project", "Suitable for projects that need a large number of different configurations, such as testing on multiple environments, platform-specific builds, etc."},
-                {"Folder", "Creates a container that stores nested items in it. Useful for grouping things together. Unlike view, which is just a filter, a folder creates a separate namespace, so you can have multiple things of the same name as long as they are in different folders."},
-                {"Multibranch Pipeline", "Creates a set of Pipeline projects according to detected branches in one SCM repository."},
-                {"Organization Folder", "Creates a set of multibranch project subfolders by scanning for repositories."}
-        };
-    }
+    @Test(dataProvider = "itemTypes", dataProviderClass = TestDataProvider.class)
+    public void testOkButtonWhenFieldIsEmpty(String itemTypeName) {
+        NewItemPage newItemPage = homePage.clickNewItemOnLeftSidePanel().clickOnJobItem(itemTypeName);
 
-    @Test
-    public void testOkButtonWhenFieldIsEmpty() {
-        clickOnNewItemLink();
-
-        List<WebElement> newItemTypes = getNewItemTypes();
-        int expectedScrollValue = getScrollValue();
-
-        for (int i = 0; i < newItemTypes.size(); i++) {
-            newItemTypes.get(i).click();
-            actions.scrollByAmount(0, expectedScrollValue).perform();
-
-            Assert.assertFalse(getDriver().findElement(By.id("ok-button")).isEnabled());
-        }
+        Assert.assertFalse(newItemPage.isOkButtonEnabled());
     }
 
     @Test
     public void testIfErrorMessageIsDisplayedWhenFieldIsEmpty() {
-        clickOnNewItemLink();
+        NewItemPage newItemPage = homePage.clickNewItemOnLeftSidePanel().selectFreestyle();
 
-        List<WebElement> newItemTypes = getNewItemTypes();
-        int expectedScrollValue = getScrollValue();
-
-        for (int i = 0; i < newItemTypes.size(); i++) {
-            newItemTypes.get(i).click();
-            actions.scrollByAmount(0, expectedScrollValue).perform();
-
-            Assert.assertEquals(
-                    getDriver().findElement(By.cssSelector(".input-validation-message")).getText(),
-                    "» This field cannot be empty, please enter a valid name"
-            );
-        }
+        Assert.assertEquals(
+                         newItemPage.getErrorMessageOnEmptyField(),
+                "» This field cannot be empty, please enter a valid name"
+        );
     }
 
     @Test
@@ -336,8 +290,8 @@ public class NewItemPage2Test extends BaseTest {
         );
     }
 
-    @Test(dataProvider = "itemTypes")
-    public void testJobCreationWithinFolder(String itemTypeName, String expectedItemDescription) {
+    @Test(dataProvider = "itemTypes", dataProviderClass = TestDataProvider.class)
+    public void testJobCreationWithinFolder(String itemTypeName) {
         String randomAlphaNumericValue = TestUtils.generateRandomAlphanumeric();
 
         TestUtils.newItemCreate(this, TestUtils.generateRandomAlphanumeric(), 4);
@@ -360,8 +314,8 @@ public class NewItemPage2Test extends BaseTest {
         );
     }
 
-    @Test(dataProvider = "itemTypes")
-    public void testIf(String itemTypeName, String expectedItemDescription) {
+    @Test(dataProvider = "itemTypes", dataProviderClass = TestDataProvider.class)
+    public void testIf(String itemTypeName) {
         String firstFolderProjectName = TestUtils.generateRandomAlphanumeric();
         String secondFolderProjectName = TestUtils.generateRandomAlphanumeric();
         String randomAlphaNumericValue = TestUtils.generateRandomAlphanumeric();

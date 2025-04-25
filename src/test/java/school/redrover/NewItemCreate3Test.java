@@ -60,25 +60,41 @@ public class NewItemCreate3Test extends BaseTest {
             getDriver().findElement(By.id("name")).clear();
         }
     }
+    @Test
+    public  void  testCreateNewItemWithCorrectName() {
+        final String newItemName = "New free-style project";
+        final String expectedName = "New free-style project";
 
-    @Ignore
+        goToNewItemPage();
+        getDriver().findElement(By.id("name")).sendKeys(newItemName);
+        getDriver().findElement(By.className("hudson_model_FreeStyleProject")).click();
+        getDriver().findElement(By.id("ok-button")).click();
+
+        Assert.assertEquals(getWait10().until(ExpectedConditions.visibilityOfElementLocated(
+                By.xpath("//*[@id=\"breadcrumbs\"]/li[3]/a"))).getText(), expectedName);
+
+    }
+
     @Test
     public void testCreateNewItemWithExistingName() {
         goToNewItemPage();
         final String projectName = "New FreeStyleProject";
+
         getDriver().findElement(By.id("name")).sendKeys(projectName);
         getDriver().findElement(By.className("hudson_model_FreeStyleProject")).click();
-        getDriver().findElement(By.id("ok-button")).click();
+        TestUtils.scrollAndClickWithJS(getDriver(), getDriver().findElement(By.id("ok-button")));
 
         TestUtils.gotoHomePage(this);
         Assert.assertEquals(
                 getWait5().until(ExpectedConditions.visibilityOfElementLocated(By.linkText("New FreeStyleProject")))
                         .getText(), "New FreeStyleProject");
 
+        getWait5().until(ExpectedConditions.visibilityOfElementLocated(By.linkText("New Item")));
         goToNewItemPage();
         getDriver().findElement(By.id("name")).sendKeys(projectName);
-        WebElement el = getDriver().findElement(By.id("itemname-invalid"));
-        TestUtils.scrollToItemWithJS(getDriver(), el);
+        WebElement el = getWait10().until(ExpectedConditions.presenceOfElementLocated(By.id("itemname-invalid")));
+        getWait5().until(ExpectedConditions.visibilityOf(el));
+
         Assert.assertEquals(el.getText(), "» A job already exists with the name ‘New FreeStyleProject’");
     }
 }

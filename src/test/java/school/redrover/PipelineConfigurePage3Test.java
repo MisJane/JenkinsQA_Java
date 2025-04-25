@@ -1,11 +1,10 @@
 package school.redrover;
 
-import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import school.redrover.common.BaseTest;
 import school.redrover.page.HomePage;
-import school.redrover.page.PipelineConfigurationPage;
+import school.redrover.page.pipeline.PipelineConfigurationPage;
 
 public class PipelineConfigurePage3Test extends BaseTest {
     final String projectName = "Pipeline1";

@@ -4,7 +4,7 @@ package school.redrover;
 import org.testng.Assert;
 import school.redrover.common.BaseTest;
 import org.testng.annotations.Test;
-import school.redrover.page.FolderProjectPage;
+import school.redrover.page.folder.FolderProjectPage;
 import school.redrover.page.HomePage;
 
 public class  AccessProjectTest extends BaseTest {

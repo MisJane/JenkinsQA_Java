@@ -1,9 +1,8 @@
-package school.redrover.page;
+package school.redrover.page.freestyle;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.checkerframework.common.value.qual.IntRange;
+import org.openqa.selenium.*;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import school.redrover.common.BasePage;
 
@@ -214,5 +213,56 @@ public class FreestyleConfigurationPage extends BasePage {
     public String getGithubHookTriggerHelpIconTitle() {
         return getDriver().findElement(By.xpath("//*[@id=\"main-panel\"]/form/div[1]/section[3]/div[6]/div[1]/div/a"))
                 .getDomAttribute("title");
+    }
+
+    public FreestyleConfigurationPage addBuildSteps(@IntRange(from = 1, to = 7) int itemNumber){
+        Actions actions = new Actions(getDriver());
+
+        actions.scrollToElement(getWait5()
+                .until(ExpectedConditions.elementToBeClickable(By.cssSelector("button[suffix='publisher']")))).perform();
+
+        getWait5().until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("button[suffix='builder']"))).click();
+
+        getWait5().until(ExpectedConditions.visibilityOfElementLocated(
+                By.xpath("//*[@id='tippy-5']/div/div/div/div[2]/button[" + itemNumber + "]"))).click();
+
+        actions.sendKeys(Keys.END).perform();
+
+        return this;
+    }
+
+    public List<String> getBuildStepsList() {
+        return getDriver().findElements(By.cssSelector(".repeated-chunk__header")).stream()
+                .map(WebElement::getText)
+                .map(text -> text.replace("?", ""))
+                .filter(text -> !text.trim().isEmpty())
+                .toList();
+    }
+
+    public FreestyleConfigurationPage clickTriggerBuildsRemotely() {
+        getDriver().findElement(By.xpath("//label[contains(text(), 'Trigger builds remotely')]")).click();
+
+        return this;
+    }
+
+    public FreestyleConfigurationPage enterAuthToken(String token) {
+        getDriver().findElement(By.xpath("//input[@name='authToken']")).sendKeys(token);
+
+        return this;
+    }
+
+    public String getAuthenticationTokenLabelText() {
+        return getDriver().findElement(By.xpath("//div[text()='Authentication Token']")).getText();
+    }
+
+    public String getAuthTokenDomValue() {
+        return getDriver().findElement(By.xpath("//input[@name='authToken']")).getDomAttribute("value");
+    }
+
+    public String getTriggerInfoText() {
+        return getDriver()
+                .findElement(By.xpath("//*[@id='main-panel']/form/div[1]/section[3]/div[3]/div[4]/div/div[2]"))
+                .getText()
+                .trim();
     }
 }

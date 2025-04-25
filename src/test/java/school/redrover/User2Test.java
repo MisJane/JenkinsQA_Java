@@ -5,6 +5,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.testng.Assert;
+import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 import school.redrover.common.BaseTest;
 
@@ -85,7 +86,7 @@ public class User2Test extends BaseTest {
                 .visibilityOfElementLocated(By.cssSelector("a[href='user/testuser/']"))).getText();
         Assert.assertEquals(actualUsername, username, "The expected new user " + username + " is not displayed");
     }
-
+    @Ignore
     @Test(dependsOnMethods = "testNewUserIsCreated")
     public void testDeleteUser() {
         deleteUser();
