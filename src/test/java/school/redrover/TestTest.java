@@ -5,6 +5,8 @@ import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import school.redrover.common.BaseTest;
+import school.redrover.page.HomePage;
+
 
 public class TestTest extends BaseTest {
     @Test
@@ -17,4 +19,33 @@ public class TestTest extends BaseTest {
 
         Assert.assertTrue(driver.findElement(By.xpath("//div[@id='description']/div[1]")).getText().contains("I'm a user"));
     }
+
+    @Test
+    public void testHomePagePOM(){
+       String str = new HomePage(getDriver())
+               .getWelcomeMessage();
+       Assert.assertEquals(str, "Welcome to Jenkins!");
+
+    }
+
+    @Test
+    public void testNewItemPOM(){
+        String name = "Pipeline1";
+        String str = new HomePage(getDriver())
+                .clickNewItem()
+                .sendItemName(name)
+                .selectPipelineAndClickOk()
+                .clickSave()
+                .getProjectName();
+
+
+        Assert.assertEquals(str, name);
+
+
+
+//                .selectFolderAndClickOk()
+//                .getConfidurationText();
+
+    }
+
 }

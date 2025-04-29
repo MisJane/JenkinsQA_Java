@@ -59,10 +59,16 @@ public class PipelineConfigurationPage extends BasePage {
         return getDriver().findElement(toggleEnabled).isDisplayed();
     }
 
-    public PipelineProjectPage clickSave() {
-        getDriver().findElement(By.cssSelector("button[name='Submit']")).click();
-
+    public PipelineProjectPage clickSave(){
+        getWait5().until(ExpectedConditions.elementToBeClickable(getDriver()
+                .findElement(By.cssSelector("button[name='Submit']")))).click();
         return new PipelineProjectPage(getDriver());
+    }
+
+
+    public String getConfidurationText(){
+        return getWait5().until(ExpectedConditions.visibilityOf(getDriver().
+                findElement(By.xpath("//h1")))).getText();
     }
 
 

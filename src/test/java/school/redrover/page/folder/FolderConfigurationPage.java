@@ -38,4 +38,9 @@ public class FolderConfigurationPage extends BasePage {
         return new HomePage(getDriver());
     }
 
+    public String getConfidurationText(){
+       return getWait5().until(ExpectedConditions.visibilityOf(getDriver().
+               findElement(By.xpath("//h1")))).getText();
+    }
+
 }
