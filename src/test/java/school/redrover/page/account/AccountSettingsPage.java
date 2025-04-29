@@ -17,4 +17,12 @@ public class AccountSettingsPage extends BasePage {
     public String getDescription() {
         return getDriver().findElement(By.id("description")).getText();
     }
+
+    public String getUserButton() {
+        return getDriver().findElement(By.xpath("//*[@id='page-header']/div[3]/a[1]/span")).getText();
+    }
+
+    public String getFullUserName() {
+        return getDriver().findElement(By.xpath("//*[@id='main-panel']/div[1]/div[1]/h1")).getText();
+    }
 }

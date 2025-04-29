@@ -1,14 +1,22 @@
-package school.redrover.page.multiconfiguration;
+package school.redrover.page.multibranch;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.interactions.Actions;
 import school.redrover.common.BasePage;
 
 public class MultibranchConfigurationPage extends BasePage {
 
     public MultibranchConfigurationPage(WebDriver driver) { super(driver); }
 
-    public MultibranchConfigurationPage clickEnableToggle() {
+    public MultibranchConfigurationPage hoverOnEnabledDisabledToggle() {
+        Actions action = new Actions(getDriver());
+        action.moveToElement(getDriver().findElement(By.id("toggle-switch-enable-disable-project"))).perform();
+
+        return this;
+    }
+
+    public MultibranchConfigurationPage clickEnabledDisabledToggle() {
         getDriver().findElement(By.className("jenkins-toggle-switch__label")).click();
 
         return this;
@@ -26,5 +34,9 @@ public class MultibranchConfigurationPage extends BasePage {
 
     public String getEnableToggleText() {
         return getDriver().findElement(By.className("jenkins-toggle-switch__label__checked-title")).getText();
+    }
+
+    public String getEnabledDisabledToggleShownAttribute() {
+        return getDriver().findElement(By.id("toggle-switch-enable-disable-project")).getDomAttribute("aria-describedby");
     }
 }

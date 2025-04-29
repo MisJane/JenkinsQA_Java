@@ -45,7 +45,6 @@ public class FolderConfigurationTest extends BaseTest {
                 (By.xpath("//*[@id='tasks']/div[2]/span/a"))).click();
         getWait5().until(ExpectedConditions.elementToBeClickable
                 (By.className("textarea-show-preview"))).click();
-
         WebElement previewDescription = getWait5().until(ExpectedConditions.visibilityOfElementLocated
                 (By.xpath("//div[text()='"+DESCRIPTION_BOX+"']")));
 

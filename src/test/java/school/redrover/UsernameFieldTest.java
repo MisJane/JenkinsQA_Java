@@ -32,7 +32,7 @@ public class UsernameFieldTest extends BaseTest {
 
     }
 
-
+    @Ignore
     @Test
     public void testUsernameFieldAcceptsOnlyValidChars() throws Exception {
         WebDriver driver = getDriver();

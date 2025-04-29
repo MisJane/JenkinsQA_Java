@@ -7,28 +7,9 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import school.redrover.common.BaseTest;
-import school.redrover.common.TestUtils;
 import school.redrover.page.HomePage;
 
 public class Folder1Test extends BaseTest {
-
-    @Test
-    public void testIfCopyFromFieldAppears() {
-        final String folderName = "My Super Cool Folder";
-
-        HomePage homePage = new HomePage(getDriver());
-        homePage
-                .clickNewItemOnLeftSidePanel()
-                .sendItemName(folderName)
-                .selectFolderAndClickOk();
-        TestUtils.clickOnJenkinsLogo(this);
-
-        String copyFromFieldText = homePage
-                .clickNewItemOnLeftSidePanel()
-                .getCopyFromFieldText();
-
-        Assert.assertEquals(copyFromFieldText, "Copy from");
-    }
 
     @Test
     public void testAddItemToFolder() {

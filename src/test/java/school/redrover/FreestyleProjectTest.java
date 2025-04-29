@@ -1,9 +1,10 @@
 package school.redrover;
 
 import org.testng.Assert;
-import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 import school.redrover.common.BaseTest;
+import school.redrover.component.HeaderComponent;
+import school.redrover.page.freestyle.FreestyleConfigurationPage;
 import school.redrover.page.freestyle.FreestyleProjectPage;
 import school.redrover.page.HomePage;
 
@@ -15,6 +16,8 @@ public class FreestyleProjectTest extends BaseTest {
 
     private static final String PROJECT_NAME = "Freestyle Project";
     private static final String UPDATED_PROJECT_NAME = "NEW Freestyle NAME";
+    private static final String PROJECT_DESCRIPTION = "This is a NEW freestyleProject description";
+    private static final String SECOND_PROJECT_NAME = "Second Freestyle Project";
 
     @Test
     public void testCreateFreestyleProject() {
@@ -65,15 +68,14 @@ public class FreestyleProjectTest extends BaseTest {
 
     @Test(dependsOnMethods = "testCreateDuplicate")
     public void testEditDescription() {
-        final String newProjectDescription = "This is a NEW freestyleProject description";
-
-        FreestyleProjectPage freestyleProjectPage = new HomePage(getDriver())
+        String freestyleProjectDescriptionText = new HomePage(getDriver())
                 .clickOnJobInListOfItems(PROJECT_NAME, new FreestyleProjectPage(getDriver()))
                 .clickEditDescriptionButton()
-                .sendDescription(newProjectDescription)
-                .clickSave();
+                .sendDescription(PROJECT_DESCRIPTION)
+                .clickSave()
+                .getDescription();
 
-        Assert.assertEquals(freestyleProjectPage.getDescription(), newProjectDescription);
+        Assert.assertEquals(freestyleProjectDescriptionText, PROJECT_DESCRIPTION);
     }
 
     @Test(dependsOnMethods = "testEditDescription")
@@ -111,8 +113,98 @@ public class FreestyleProjectTest extends BaseTest {
                 .addBuildSteps(5)
                 .addBuildSteps(6)
                 .addBuildSteps(1)
-                .getBuildStepsList();
+                .getChunkHeaderList();
 
         assertEquals(projectNameList.size(), 7);
+    }
+
+    @Test
+    public void testCreateWithDescription() {
+        String freestyleProjectDescriptionText = new HomePage(getDriver())
+                .clickNewItemOnLeftSidePanel()
+                .sendItemName(PROJECT_NAME)
+                .selectFreestyleAndClickOk()
+                .addDescription(PROJECT_DESCRIPTION)
+                .clickSaveButton()
+                .getDescription();
+
+        Assert.assertEquals(freestyleProjectDescriptionText, PROJECT_DESCRIPTION);
+    }
+
+    @Test
+    public void testEmptyItemNameField() {
+        final String message = "» This field cannot be empty, please enter a valid name";
+
+        String actualMessage = new HomePage(getDriver())
+                .createJob()
+                .selectFreestyle()
+                .getErrorMessageOnEmptyField();
+
+        Assert.assertEquals(actualMessage, message);
+    }
+
+    @Test
+    public void testTriggerBuildAfterOtherProjects() {
+        new HomePage(getDriver())
+                .clickNewItem()
+                .sendItemName(PROJECT_NAME)
+                .selectFreestyleClickOkAndWaitCreateItemFormIsClose();
+
+        new HeaderComponent(getDriver())
+                .goToHomePage()
+                .clickNewItem()
+                .sendItemName(SECOND_PROJECT_NAME)
+                .selectFreestyleClickOkAndWaitCreateItemFormIsClose()
+                .clickToReverseBuildTriggerAndSetUpStreamProject(PROJECT_NAME)
+                .clickSaveButton()
+                .waitUntilTextNameProjectToBePresentInH1(SECOND_PROJECT_NAME);
+
+        final List<String> builds = new HeaderComponent(getDriver())
+                .goToHomePage()
+                .clickJobLink(PROJECT_NAME)
+                .clickBuildNow()
+                .waitJobStarted(SECOND_PROJECT_NAME)
+                .getBuildList();
+
+        final String buildStatusText = new FreestyleConfigurationPage(getDriver()).getBuildStatusText();
+
+        Assert.assertEquals(builds.size(), 1);
+        Assert.assertTrue(buildStatusText.contains("Today"));
+        Assert.assertTrue(buildStatusText.contains("#1"));
+    }
+
+    @Test
+    public void testAddPostBuildActions () {
+        List<String> postBuildNameList = new HomePage(getDriver())
+                .clickNewItem()
+                .sendItemName(PROJECT_NAME)
+                .selectFreestyleAndClickOk()
+                .addPostBuildActions(1)
+                .addPostBuildActions(5)
+                .addPostBuildActions(1)
+                .addPostBuildActions(11)
+                .addPostBuildActions(2)
+                .addPostBuildActions(8)
+                .addPostBuildActions(10)
+                .getChunkHeaderList();
+
+        assertEquals(postBuildNameList.size(), 6);
+    }
+
+    @Test
+    public void testAddBuildStepsANDPostBuildActions () {
+        List<String> postBuildNameList = new HomePage(getDriver())
+                .clickNewItem()
+                .sendItemName(PROJECT_NAME)
+                .selectFreestyleAndClickOk()
+                .addPostBuildActions(1)
+                .addPostBuildActions(5)
+                .addBuildSteps(5)
+                .addPostBuildActions(11)
+                .addBuildSteps(7)
+                .addPostBuildActions(8)
+                .getChunkHeaderList();
+
+        assertEquals(postBuildNameList.size(), 6);
     }
 }

@@ -9,6 +9,7 @@ import org.testng.annotations.Test;
 import school.redrover.common.BaseTest;
 import school.redrover.page.HomePage;
 import school.redrover.page.newitem.NewItemPage;
+import school.redrover.testdata.TestDataProvider;
 
 import java.util.List;
 
@@ -54,15 +55,14 @@ public class NewItem5Test extends BaseTest {
     }
 
     @Ignore
-    @Test
-    public void testItemNameFieldAcceptsAlphanumericsAndSpecialCharacters() {
-        final String ACCEPTABLE_CHARACTERS = "Q w1`~()_-+={}'\".,";
+    @Test(dataProvider = "safeCharacters", dataProviderClass = TestDataProvider.class)
+    public void testCreateItemNameWithSafeCharacters(String safeCharacter) {
+        boolean isUnsafeCharacterMessageDisplayed = new HomePage(getDriver())
+                .clickNewItemOnLeftSidePanel()
+                .sendItemName(safeCharacter)
+                .isUnsafeCharacterMessageDisplayed();
 
-        getDriver().findElement(By.xpath("//span[text()='New Item']/ancestor::span[@class='task-link-wrapper ']")).click();
-        getDriver().findElement(By.cssSelector(".jenkins-input#name")).sendKeys(ACCEPTABLE_CHARACTERS);
-        WebElement invalidCharacterMessage = getDriver().findElement(By.id("itemname-invalid"));
-
-        Assert.assertFalse(invalidCharacterMessage.isDisplayed(), "An unsafe character error message is displayed");
+        Assert.assertFalse(isUnsafeCharacterMessageDisplayed);
     }
 
     @Test

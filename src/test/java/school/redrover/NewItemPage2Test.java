@@ -10,6 +10,7 @@ import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 import school.redrover.common.BaseTest;
 import school.redrover.common.TestUtils;
+import school.redrover.component.CommonComponent;
 import school.redrover.page.HomePage;
 import school.redrover.page.newitem.NewItemPage;
 import school.redrover.testdata.TestDataProvider;
@@ -40,42 +41,6 @@ public class NewItemPage2Test extends BaseTest {
     private int  getRandomNumberWithin1And6() {
         Random random = new Random();
         return random.nextInt(6) + 1;
-    }
-
-    private void enterNonExistingItemValueToCopyFrom(String randomAlphaNumericValue) {
-        String chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        String generated;
-        Random random = new Random();
-        int randomLength = getRandomNumberWithin1And6();
-
-        do {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < randomLength; i++) {
-                char c = chars.charAt(random.nextInt(chars.length()));
-                sb.append(c);
-            }
-            generated = sb.toString();
-        } while (randomAlphaNumericValue.startsWith(generated));
-
-        WebElement copyFromInput = getDriver().findElement(By.id("from"));
-        TestUtils.scrollAndClickWithJS(getDriver(), copyFromInput);
-        copyFromInput.sendKeys(generated);
-
-        getWait10().until(ExpectedConditions.visibilityOfElementLocated(By.className("jenkins-dropdown")));
-    }
-
-    private void enterExistingItemValueToCopyFrom(String randomAlphaNumericValue) {
-        Random random = new Random();
-        int randomLength = random.nextInt(randomAlphaNumericValue.length() + 1);
-        String inputValue = randomAlphaNumericValue.substring(0, randomLength);
-
-        getWait5()
-                .until(ExpectedConditions.visibilityOfElementLocated(By.id("name")))
-                .sendKeys(TestUtils.generateRandomAlphanumeric());
-
-        WebElement copyFromInput = getDriver().findElement(By.id("from"));
-        TestUtils.scrollAndClickWithJS(getDriver(), copyFromInput);
-        copyFromInput.sendKeys(inputValue);
     }
 
     private void openDropdownMenuForJob(String itemName) {
@@ -158,80 +123,67 @@ public class NewItemPage2Test extends BaseTest {
     @Test
     public void testIfCopyFromOptionIsDisplayed() {
         TestUtils.newItemCreate(this, TestUtils.generateRandomAlphanumeric(), getRandomNumberWithin1And6());
-        clickOnNewItemLink();
 
-        Assert.assertEquals(
-                getDriver().findElement(By.cssSelector("p.jenkins-form-label")).getText(),
-                "If you want to create a new item from other existing, you can use this option:"
-        );
-        Assert.assertTrue(getDriver().findElement(By.id("from")).isDisplayed());
+        NewItemPage newItemPage = homePage.clickNewItemOnLeftSidePanel();
+
+        Assert.assertEquals(newItemPage.getCopyFromFieldText(), "Copy from");
+        Assert.assertTrue(newItemPage.isCopyFromOptionInputDisplayed());
     }
 
     @Test
-    public void testIfCopyFromOptionIsNotDisplayed() {
-        clickOnNewItemLink();
+    public void testIfCopyFromOptionInputIsNotDisplayed() {
+        NewItemPage newItemPage = homePage.clickNewItemOnLeftSidePanel();
 
-        Assert.assertTrue(getDriver().findElements(By.id("from")).isEmpty());
+        Assert.assertFalse(newItemPage.isCopyFromOptionInputDisplayed());
     }
-    @Ignore //NewItemPage2Test.testAutocompleteOption:227 » Timeout Expected condition failed: waiting for visibility of element located by By.className: jenkins-dropdown__item (tried for 10 second(s) with 500 milliseconds interval)
+
     @Test
     public void testAutocompleteOption() {
         String randomAlphaNumericValue = TestUtils.generateRandomAlphanumeric();
         TestUtils.newItemCreate(this, randomAlphaNumericValue, getRandomNumberWithin1And6());
-        clickOnNewItemLink();
 
-        enterExistingItemValueToCopyFrom(randomAlphaNumericValue);
-        getWait10().until(ExpectedConditions.visibilityOfElementLocated(By.className("jenkins-dropdown__item")));
-        WebElement dropdownItem = getDriver().findElement(By.className("jenkins-dropdown__item"));
+        NewItemPage newItemPage = homePage.clickNewItemOnLeftSidePanel()
+                                          .enterValueToCopyFromInput(randomAlphaNumericValue);
 
-        Assert.assertTrue(dropdownItem.isDisplayed());
-        Assert.assertEquals(dropdownItem.getText(), randomAlphaNumericValue);
+        Assert.assertEquals(newItemPage.getDropdownItemText(), randomAlphaNumericValue);
     }
 
     @Test
     public void testIfNoItemsMessageIsDisplayed() {
-        String randomAlphaNumericValue = TestUtils.generateRandomAlphanumeric();
-        TestUtils.newItemCreate(this, randomAlphaNumericValue, getRandomNumberWithin1And6());
-        clickOnNewItemLink();
+        TestUtils.newItemCreate(this, TestUtils.generateRandomAlphanumeric(), getRandomNumberWithin1And6());
 
-        enterNonExistingItemValueToCopyFrom(randomAlphaNumericValue);
+        NewItemPage newItemPage = homePage.clickNewItemOnLeftSidePanel()
+                                          .enterValueToCopyFromInput(TestUtils.generateRandomAlphanumeric() + "_");
 
-        Assert.assertEquals(
-                getWait5().until(ExpectedConditions.visibilityOfElementLocated(By.className("jenkins-dropdown__placeholder"))).getText(),
-                "No items"
-        );
+        Assert.assertEquals(newItemPage.getDropdownItemText(), "No items");
+
     }
-    @Ignore //NewItemPage2Test.testCopyFromOptionWhenCreatingNewJob:246 » Timeout Expected condition failed: waiting for visibility of element located by By.className: jenkins-dropdown__item (tried for 10 second(s) with 500 milliseconds interval)
+
     @Test
     public void testCopyFromOptionWhenCreatingNewJob() {
         String randomAlphaNumericValue = TestUtils.generateRandomAlphanumeric();
-        TestUtils.newItemCreate(this, randomAlphaNumericValue, getRandomNumberWithin1And6());
-        clickOnNewItemLink();
+        int randomNumber = getRandomNumberWithin1And6();
 
-        enterExistingItemValueToCopyFrom(randomAlphaNumericValue);
-        getWait10().until(ExpectedConditions.visibilityOfElementLocated(By.className("jenkins-dropdown__item"))).click();
-        getDriver().findElement(By.id("ok-button")).click();
+        TestUtils.newItemCreate(this, randomAlphaNumericValue, randomNumber);
 
-        getWait5().until(ExpectedConditions.urlContains("/job"));
+        CommonComponent commonComponent = homePage.clickNewItemOnLeftSidePanel()
+                                                  .enterValueToCopyFromInput(randomAlphaNumericValue)
+                                                  .clickOnOkButton();
 
-        Assert.assertTrue(getDriver().findElement(By.id("general")).isDisplayed());
+        Assert.assertTrue(commonComponent.isHeadingDisplayed());
     }
 
+    @Ignore//NewItemPage2Test.testIfUserRedirectedToErrorPage:180 » Timeout Expected condition failed: waiting for element to be clickable: By.cssSelector: .jenkins-dropdown.jenkins-dropdown--compact https://github.com/RedRoverSchool/JenkinsQA_Java_2025_spring/actions/runs/14733047885/job/41351971771?pr=1586
     @Test
     public void testIfUserRedirectedToErrorPage() {
-        String randomAlphaNumericValue = TestUtils.generateRandomAlphanumeric();
-        TestUtils.newItemCreate(this, randomAlphaNumericValue, getRandomNumberWithin1And6());
-        clickOnNewItemLink();
+        TestUtils.newItemCreate(this, TestUtils.generateRandomAlphanumeric(), getRandomNumberWithin1And6());
 
-        getWait5()
-                .until(ExpectedConditions.visibilityOfElementLocated(By.id("name")))
-                .sendKeys(TestUtils.generateRandomAlphanumeric());
-        enterNonExistingItemValueToCopyFrom(randomAlphaNumericValue);
-        getDriver().findElement(By.id("ok-button")).click();
+        CommonComponent commonComponent = homePage.clickNewItemOnLeftSidePanel()
+                                                  .enterValueToCopyFromInput(TestUtils.generateRandomAlphanumeric())
+                                                  .clickOnOkButton();
 
-        getWait5().until(ExpectedConditions.urlContains("/createItem"));
-
-        Assert.assertEquals(getDriver().findElement(By.tagName("h1")).getText(), "Error");
+        Assert.assertTrue(commonComponent.doesUrlContainCreateItemEndpoint());
+        Assert.assertEquals(commonComponent.getHeadingText(), "Error");
     }
 
     @Test

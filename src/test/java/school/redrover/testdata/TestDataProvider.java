@@ -8,6 +8,12 @@ public class TestDataProvider {
 
     private static final String MAX_PROJECT_NAME = "a".repeat(255);
 
+    @DataProvider
+    public Object[][] safeCharacters() {
+        return new Object[][] {{"Q"}, {"q"}, {"1"}, {"`"}, {"~"}, {"("}, {")"}, {"_"},
+                {"-"}, {"+"}, {"="}, {"{"}, {"}"},  {"'"}, {"\""}, {"a.a"}, {","}};
+    }
+
     @DataProvider(name = "provideInvalidCharacters")
     public static Object[][] provideInvalidCharacters() {
         return new Object[][]{

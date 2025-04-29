@@ -1,33 +1,37 @@
 package school.redrover;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.testng.Assert;
 import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 import school.redrover.common.BaseTest;
+import school.redrover.page.HomePage;
+import school.redrover.page.buildhistory.BuildHistoryPage;
+import school.redrover.page.freestyle.FreestyleConfigurationPage;
+import school.redrover.page.newitem.NewItemPage;
 
 public class AssemblyTest extends BaseTest {
 
     @Ignore
     @Test
     public void testBuildHistory() {
-        WebDriver driver = getDriver();
+        final String text = "Freestyle";
+        final String text2 ="No builds";
 
-        driver.findElement(By.xpath("//a[@class='task-link task-link-no-confirm ']")).click();
-        driver.findElement(By.xpath("//input[@class='jenkins-input']")).sendKeys("Freestule");
-        driver.findElement(By.xpath("//li[@class='hudson_model_FreeStyleProject']")).click();
-        driver.findElement(By.id("ok-button")).click();
-        driver.findElement(By.xpath("//a[text()='Freestule']")).click();
-        driver.findElement(By.xpath("//a[@data-task-post='true']")).click();
-        getWait5().until(ExpectedConditions.visibilityOfElementLocated
-                (By.className("app-builds-container__items"))).click();
-        driver.findElement(By.xpath("/html/body/div[3]/div[1]/div/div[5]/span/a")).click();
-        driver.findElement(By.xpath("//span[text()='Delete the build ‘#1’?']")).getText();
-        driver.findElement(By.name("Submit")).click();
+        new HomePage(getDriver())
+                .clickNewItem();
 
-        Assert.assertEquals(driver.findElement
-                (By.id("no-builds")).getText(),"No builds");
+        new NewItemPage(getDriver())
+                .sendItemName(text)
+                .selectFreestyleAndClickOk();
+
+        new FreestyleConfigurationPage(getDriver())
+                .clickFreestyleText();
+
+        String buildHistory = new BuildHistoryPage(getDriver())
+                .clickCollectNow()
+                .clickDeleteBuild()
+                .getTextNoBuilds();
+
+        Assert.assertEquals(buildHistory, text2);
     }
 }

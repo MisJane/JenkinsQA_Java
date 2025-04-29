@@ -1,6 +1,7 @@
 package school.redrover;
 
 import org.testng.Assert;
+import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 import school.redrover.common.BaseTest;
 import school.redrover.page.freestyle.FreestyleProjectPage;
@@ -21,6 +22,6 @@ public class BreadCrumbsDropDownMenuTest extends BaseTest {
 
         String[] mainMenuItems = new FreestyleProjectPage(getDriver()).getMainMenuItemsText();
 
-        Assert.assertEquals(mainMenuItems, dropDownMenuItems, "Items don't match.");
+        Assert.assertEquals(mainMenuItems, dropDownMenuItems);
     }
 }

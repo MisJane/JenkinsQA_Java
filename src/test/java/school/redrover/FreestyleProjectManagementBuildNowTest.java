@@ -27,7 +27,7 @@ public class FreestyleProjectManagementBuildNowTest extends BaseTest {
         
         driver.findElement(By.name("Submit")).click();
     }
-    @Ignore //FreestyleProjectManagementBuildNowTest.testAvailableBuildNowOnProjectPage:37 » Timeout Expected condition failed: waiting for visibility of element located by By.xpath: //a[contains(@href,'build')][1] (tried for 5 second(s) with 500 milliseconds interval)
+
     @Test
     public void testAvailableBuildNowOnProjectPage() {
         WebDriver driver = getDriver();
@@ -44,7 +44,7 @@ public class FreestyleProjectManagementBuildNowTest extends BaseTest {
                 getWait10().until(ExpectedConditions.visibilityOfElementLocated(By.id("notification-bar"))).getText(),
                 "Build scheduled");
     }
-    @Ignore//FreestyleProjectManagementBuildNowTest.testAvailableBuildNowOnbreadcrumbs:57 » Timeout Expected condition failed: waiting for visibility of element located by By.xpath: //td//a[@tooltip][contains(@href,'build')] (tried for 10 second(s) with 500 milliseconds interval)
+    @Ignore
     @Test
     public void testAvailableBuildNowOnbreadcrumbs() {
         WebDriver driver = getDriver();

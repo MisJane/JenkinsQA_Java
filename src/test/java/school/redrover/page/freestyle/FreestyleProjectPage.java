@@ -19,7 +19,7 @@ public class FreestyleProjectPage extends BasePage {
     }
 
     public String getProjectName() {
-        return getDriver().findElement(By.className("page-headline")).getText();
+        return getWait5().until(ExpectedConditions.visibilityOfElementLocated(By.className("page-headline"))).getText();
     }
 
     public String getDescription() {
@@ -145,5 +145,16 @@ public class FreestyleProjectPage extends BasePage {
         getWait5().until(ExpectedConditions.textToBePresentInElementLocated(By.tagName("h1"), text));
 
         return this;
+    }
+
+    public FreestyleProjectPage clickLeftSideMenuBuildNow() {
+        getDriver().findElement(By.xpath("//span[text()='Build Now']/..")).click();
+
+        return this;
+    }
+
+    public List<String> getLeftSideMenuNameList() {
+        return getDriver().findElements(By.xpath("//div[@id='tasks']/div/span/a/span[2]")).stream()
+                .map(WebElement::getText).toList();
     }
 }

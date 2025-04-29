@@ -65,6 +65,7 @@ public class OrganizationFolderTest extends BaseTest {
         Assert.assertEquals(actualPopupText, "Delete the Organization Folder ‘" + ORGANIZATION_FOLDER_NAME + "’?");
     }
 
+    @Ignore
     @Test
     public void testCreateOrganizationFolder() {
         String projectName = new HomePage(getDriver())

@@ -8,6 +8,8 @@ import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 import school.redrover.common.BaseTest;
 import school.redrover.common.TestUtils;
+import school.redrover.page.HomePage;
+import school.redrover.page.folder.FolderProjectPage;
 import school.redrover.testdata.TestDataProvider;
 
 import java.util.List;
@@ -48,16 +50,50 @@ public class FolderTest extends BaseTest {
     }
 
     @Test
-    public void testCreateFolder() throws InterruptedException {
-        getDriver().findElement(By.xpath("//a[contains(@it,'hudson')]")).click();
-        getDriver().findElement(By.id("name")).sendKeys("NewFolder");
-        getDriver().findElement(By.xpath("//li[contains(@class,'Folder')]")).click();
-        getDriver().findElement(By.id("ok-button")).click();
-        getDriver().findElement(By.xpath("//input[@checkdependson]")).sendKeys("Folder1");
-        getDriver().findElement(By.name("Submit")).click();
+    public void testDisplayName() {
+        final String folderName = "My Super Cool Folder";
+        final String expectedDisplayName = "Folder Display Name";
 
-        Thread.sleep(2000);
+        String actualDisplayName = new HomePage(getDriver())
+                .clickNewItemOnLeftSidePanel()
+                .sendItemName(folderName)
+                .selectFolderAndClickOk()
+                .sendDisplayName(expectedDisplayName)
+                .clickSave()
+                .getProjectName();
 
-        Assert.assertEquals(getDriver().findElement(By.xpath("//h1")).getText(), "Folder1");
+        Assert.assertEquals(actualDisplayName, expectedDisplayName);
+    }
+
+    @Test
+    public void testIfCopyFromFieldAppears() {
+        final String folderName = "My Super Cool Folder";
+        final String expectedText = "Copy from";
+
+        String copyFromFieldText = new HomePage(getDriver())
+                .clickNewItemOnLeftSidePanel()
+                .sendItemName(folderName)
+                .selectFolderAndClickOk()
+                .getHeader()
+                .clickLogoIcon()
+                .clickNewItemOnLeftSidePanel()
+                .getCopyFromFieldText();
+
+        Assert.assertEquals(copyFromFieldText, expectedText);
+    }
+
+    @Test
+    public void testLinkProject () {
+        final String descriptionName = "folder";
+
+        FolderProjectPage folderProjectPage = new HomePage(getDriver())
+                .createJob()
+                .sendItemName(FOLDER_NAME)
+                .selectFolderAndClickOk()
+                .sendDescription(descriptionName)
+                .clickSave();
+
+        Assert.assertEquals(folderProjectPage.getProjectName(),FOLDER_NAME);
+        Assert.assertEquals(folderProjectPage.getDescription(),descriptionName);
     }
 }

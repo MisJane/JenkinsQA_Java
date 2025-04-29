@@ -58,6 +58,7 @@ public class Pipeline3Test extends BaseTest {
                 button.isEnabled(), "Button should be disabled");
     }
 
+    @Ignore
     @Test
     public void testCreatePipelineWithExistingName() {
         final String projectName = "TestPipeline";

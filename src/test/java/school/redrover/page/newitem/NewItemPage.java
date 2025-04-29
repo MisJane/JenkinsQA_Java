@@ -7,9 +7,12 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.WebElement;
 import school.redrover.common.BasePage;
 import school.redrover.common.TestUtils;
+import school.redrover.component.CommonComponent;
+import school.redrover.page.error.ErrorPage;
 import school.redrover.page.folder.FolderConfigurationPage;
 import school.redrover.page.freestyle.FreestyleConfigurationPage;
-import school.redrover.page.multiconfiguration.MultibranchConfigurationPage;
+import school.redrover.page.multibranch.MultibranchConfigurationPage;
+import school.redrover.page.multiconfiguration.MultiConfigurationConfigurePage;
 import school.redrover.page.organizationfolder.OrganizationFolderConfigurePage;
 import school.redrover.page.pipeline.PipelineConfigurationPage;
 
@@ -18,6 +21,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 public class NewItemPage extends BasePage {
@@ -38,6 +42,24 @@ public class NewItemPage extends BasePage {
 
     public boolean isOkButtonEnabled() {
         return getDriver().findElement(By.id("ok-button")).isEnabled();
+    }
+
+    public CommonComponent clickOnOkButton() {
+        getDriver().findElement(By.id("ok-button")).click();
+
+        return this.getCommonComponent();
+    }
+
+    public FreestyleConfigurationPage clickOkButton() {
+        getDriver().findElement(By.id("ok-button")).click();
+
+        return new FreestyleConfigurationPage(getDriver());
+    }
+
+    public ErrorPage clickOkButtonWithError() {
+        getDriver().findElement(By.id("ok-button")).click();
+
+        return new ErrorPage(getDriver());
     }
 
     public String getAlertMessageText() {
@@ -102,6 +124,13 @@ public class NewItemPage extends BasePage {
 
         return getWait10().until(ExpectedConditions.visibilityOfElementLocated(By.className("add-item-copy"))).getText();
     }
+// test
+    public MultiConfigurationConfigurePage selectMultiConfigurationAndClickOk() {
+        getDriver().findElement(By.cssSelector(".hudson_matrix_MatrixProject")).click();
+        getWait5().until(ExpectedConditions.elementToBeClickable(By.id("ok-button"))).click();
+
+        return new MultiConfigurationConfigurePage(getDriver());
+    }
 
     public MultibranchConfigurationPage selectMultibranchAndClickOk() {
         getDriver().findElement(By.xpath("//span[text()='Multibranch Pipeline']")).click();
@@ -138,14 +167,9 @@ public class NewItemPage extends BasePage {
         return new NewItemPage(getDriver());
     }
 
-    public NewItemPage selectFreestyleAndClickOkNoPageChange() {
+    public FreestyleConfigurationPage selectFreestyleClickOkAndWaitCreateItemFormIsClose() {
         getDriver().findElement(By.cssSelector(".hudson_model_FreeStyleProject")).click();
         getWait5().until(ExpectedConditions.elementToBeClickable(By.id("ok-button"))).click();
-
-        return this;
-    }
-
-    public FreestyleConfigurationPage waitInvisibilityCreateItemPage() {
         getWait10().until(ExpectedConditions.invisibilityOfElementLocated(By.id("createItem")));
 
         return new FreestyleConfigurationPage(getDriver());
@@ -215,6 +239,43 @@ public class NewItemPage extends BasePage {
         return getWait5().until
                 (ExpectedConditions.visibilityOfElementLocated((By.cssSelector("#itemname-required.input-validation-message"))))
                 .getText();
+    }
+
+    public boolean isUnsafeCharacterMessageDisplayed() {
+
+        return getDriver().findElement(By.id("itemname-invalid")).isDisplayed();
+    }
+
+    public boolean isCopyFromOptionInputDisplayed() {
+        List<WebElement> copyFromOptionInputs = getDriver().findElements(By.id("from"));
+
+        return !copyFromOptionInputs.isEmpty() && copyFromOptionInputs.get(0).isDisplayed();
+    }
+
+    public NewItemPage enterValueToCopyFromInput(String randomAlphaNumericValue) {
+        Random random = new Random();
+        int randomLength = random.nextInt(randomAlphaNumericValue.length() + 1);
+        String inputValue = randomAlphaNumericValue.substring(0, randomLength);
+
+        getWait5()
+                .until(ExpectedConditions.visibilityOfElementLocated(By.id("name")))
+                .sendKeys(TestUtils.generateRandomAlphanumeric());
+
+        WebElement copyFromInput = getDriver().findElement(By.id("from"));
+        TestUtils.scrollAndClickWithJS(getDriver(), copyFromInput);
+        copyFromInput.sendKeys(inputValue);
+
+        getWait10()
+                .until(ExpectedConditions.elementToBeClickable(By.cssSelector(".jenkins-dropdown.jenkins-dropdown--compact")))
+                .click();
+
+        return this;
+    }
+
+    public String getDropdownItemText() {
+        return getWait10()
+                          .until(ExpectedConditions.elementToBeClickable(By.cssSelector(".jenkins-dropdown.jenkins-dropdown--compact")))
+                          .getText();
     }
 }
 
